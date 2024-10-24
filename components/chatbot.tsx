@@ -19,6 +19,18 @@ export function Chatbot() {
   return (
     <div className="flex flex-col h-full max-h-[90vh] w-full max-w-[43.75rem] mx-auto bg-background rounded-lg shadow-lg">
       <div className="flex-1 overflow-auto p-4">
+		{
+          messages.length === 0 && (
+			<div className='flex flex-col justify-center items-center h-full'>
+              <SparklesIcon className='size-20 text-primary' />
+
+			  <p className='text-lg text-muted-foreground mt-4'>
+				Welcome to the Chatbot! Ask me Anything.
+			  </p>
+			</div>
+		  )
+		}
+
         <div className="flex flex-col gap-4">
           {messages.map((message) =>
 		    message.role === "user"
