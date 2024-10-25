@@ -1,10 +1,13 @@
 "use client";
 
+import { KeyboardEvent } from 'react'
 import { useChat } from 'ai/react'
-import { SendIcon, SparklesIcon } from 'lucide-react'
+import { SendIcon, SparklesIcon, SquareIcon } from 'lucide-react'
+import Markdown from 'react-markdown'
 
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
+
 
 export function Chatbot() {
   const {
@@ -12,9 +15,18 @@ export function Chatbot() {
 	input,
 	handleInputChange,
 	handleSubmit,
+	isLoading,
+	stop,
   } = useChat({
     api: "api/chat",
   })
+
+  function handleKeyDown(event: KeyboardEvent<HTMLTextAreaElement>) {
+    if (event.key === 'Enter' && !event.shiftKey && !isLoading) {
+      event.preventDefault();
+      handleSubmit();
+    }
+  };
 
   return (
     <div className="flex flex-col h-full max-h-[90vh] w-full max-w-[43.75rem] mx-auto bg-background rounded-lg shadow-lg">
@@ -51,17 +63,34 @@ export function Chatbot() {
             rows={2}
 			value={input}
 			onChange={handleInputChange}
+			onKeyDown={handleKeyDown}
           />
 
-          <Button
-		    type="submit"
-			size="icon"
-			className="absolute bottom-3 right-3 rounded-full"
-			disabled={!input}
-          >
-            <SendIcon className="w-5 h-5" />
-            <span className="sr-only">Send</span>
-          </Button>
+          {
+            isLoading
+			  ? (
+				<Button
+		          type="button"
+		    	  size="icon"
+		    	  className="absolute bottom-3 right-3 rounded-full"
+				  onClick={stop}
+                >
+                  <SquareIcon className="w-5 h-5" fill='white' />
+                  <span className="sr-only">Stop</span>
+                </Button>
+			  )
+			  : (
+				<Button
+		          type="submit"
+		    	  size="icon"
+		    	  className="absolute bottom-3 right-3 rounded-full"
+		    	  disabled={!input || isLoading}
+                >
+                  <SendIcon className="w-5 h-5" />
+                  <span className="sr-only">Send</span>
+                </Button>
+			  )
+          }
         </div>
       </form>
     </div>
@@ -88,7 +117,7 @@ function BotMessage({ content }: { content: string }) {
       </div>
 
       <div className="bg-muted rounded-lg p-3 max-w-[70%]">
-        <p className="text-sm text-muted-foreground">{content}</p>
+        <Markdown className="text-sm text-muted-foreground">{content}</Markdown>
       </div>
     </div>
   )
